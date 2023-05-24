@@ -61,7 +61,7 @@ app.post('/tasks',async (req,res)=>{
 
 app.get('/tasks',async (req,res)=>{
     try{
-        await Task.find({})
+       const tasks =  await Task.find({})
         console.log(tasks)
         res.status(200).send(tasks)
     }catch(error){
@@ -71,11 +71,13 @@ app.get('/tasks',async (req,res)=>{
 
 app.get('/tasks/:id',async (req,res)=>{
     const _id = req.params.id
+    const tasks = await Task.findOne({_id: _id})
     try{
         if(!tasks){
-            Task.findOne({_id: _id})
+           
             res.status(404).send()
         }
+        res.status(200).send(tasks)
     }catch(error){
         res.status(500).send(error)
     }
@@ -97,8 +99,8 @@ app.patch('/tasks/:id', async (req,res)=>{
     const _id = req.params.id
     try{
         const task = await Task.findByIdAndUpdate(_id,req.body,{new: true, runValidators: true})
-        if (!user){
-            return res.send.status(400)
+        if (!task){
+            res.send.status(400)
         }
         res.send(task)
     }catch(error){
@@ -113,12 +115,12 @@ app.patch('/softdelete/:id',async (req,res)=>{
         const task = await User.findByIdAndUpdate(_id, { deleted: true }, { new: true });
     
         if (!task) {
-          return res.status(404).send({ error: 'User not found' });
+          return res.status(404).send();
         }
     
         res.send(task);
       } catch (error) {
-        res.status(400).send(error);
+        res.status(500).send(error);
       }
 })
 app.listen(PORT, ()=>{
