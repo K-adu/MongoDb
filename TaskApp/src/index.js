@@ -67,7 +67,8 @@ app.get('/tasks',(req,res)=>{
 
 app.get('/tasks/:id',(req,res)=>{
     const _id = req.params.id
-    Task.findById(_id).then((tasks)=>{
+    // Task.findById(_id).then((tasks)=>{
+    Task.findOne({_id: _id}).then((tasks)=>{
         if(!tasks){
             return res.status(404).send()
         }
