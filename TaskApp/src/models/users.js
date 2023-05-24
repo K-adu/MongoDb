@@ -8,16 +8,7 @@ const User =  mongoose.model('User', {
 
 
     },
-    age: {
-        type: Number,
-        default: 0,
-        required: true,
-        validate(value){
-            if(value<0){
-                throw new Error('Age must be a postive number')
-            }
-        }
-    },
+
     email: {
         type: String,
         required: true,
@@ -35,12 +26,22 @@ const User =  mongoose.model('User', {
         required: true,
         minlength: 7,
         trim: true,
+        // validate(value){
+        //     if(value.toLowerCase().includes('password')){
+        //         throw new Error("Passoword cannot contain 'password'")
+        //     }
+        // }
+    },
+    age: {
+        type: Number,
+        default: 0,
+        required: true,
         validate(value){
-            if(value.toLowerCase().includes('password')){
-                throw new Error("Passoword cannot contain 'password'")
+            if(value<0){
+                throw new Error('Age must be a postive number')
             }
         }
-    }
+    },
 })
 
 module.exports = User
