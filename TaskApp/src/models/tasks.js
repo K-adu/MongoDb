@@ -9,6 +9,10 @@ const Task = new mongoose.model('Task',{
     completed: {
         type: Boolean,
         default: false
+    },
+    deleted: {
+        type: Boolean,
+        default: false,
     }
 })
 

@@ -11,74 +11,116 @@ const PORT = process.env.PORT || 3000
 
 
 
-app.post('/users', (req,res)=>{
+app.post('/users', async (req,res)=>{
     console.log(req.body)
     const user = new User(req.body)
 
-    user.save().then(()=>{
-        res.send(user)
-    }).catch((err)=>{
-        res.status(400)
-        res.send(err)
-    })
-
+    try{
+        await user.save()
+        res.status(201).send(user)
+    }catch(err){
+        res.status(400).send(err)
+    }
+    
 })
-app.get('/users',(req,res)=>{
-    User.find({}).then((users)=>{
-        res.send(users)
+app.get('/users', async (req, res) => {
+    try {
+      const users = await User.find({});
+      res.status(200).send(users);
+    } catch (error) {
+      res.status(400).send(error);
+    }
+  });
+  
 
-    }).catch((err)=>{
-        res.status(500).send()
-    })
-})
-
-app.get('/users/:id',(req,res)=>{
+app.get('/users/:id',async (req,res)=>{
     const _id = req.params.id
-    User.findById(_id).then((user)=>{
+    try{
+        const user = await User.findById(_id)
         if(!user){
             return res.status(404).send()
         }
         res.send(user)
-    }).catch((err)=>{
-        res.status(500).send()
-    })
+
+    }catch(error){
+        res.status(500).send(error)
+    }
+    
 })
 
-app.post('/tasks',(req,res)=>{
+app.post('/tasks',async (req,res)=>{
     const task = new Task(req.body)
-
-    task.save().then(()=>{
+    try{
+        await task.save()
         res.send(req.body)
-    }).catch((err)=>{
-        res.send.status(400)
+    }catch(error){
+        res.send(error).status(400)
         res.send(err)
-    })
+    }
 })
 
-app.get('/tasks',(req,res)=>{
-    Task.find({}).then((tasks)=>{
+app.get('/tasks',async (req,res)=>{
+    try{
+        await Task.find({})
         console.log(tasks)
         res.status(200).send(tasks)
-
-    }).catch((error)=>{
+    }catch(error){
         res.status(400).send()
-    })
+    }
 })
 
-app.get('/tasks/:id',(req,res)=>{
+app.get('/tasks/:id',async (req,res)=>{
     const _id = req.params.id
-    // Task.findById(_id).then((tasks)=>{
-    Task.findOne({_id: _id}).then((tasks)=>{
+    try{
         if(!tasks){
-            return res.status(404).send()
+            Task.findOne({_id: _id})
+            res.status(404).send()
         }
-        res.status(200).send(tasks)
-    }).catch((err)=>{
-        res.status(500).send(err)
-
-    })
+    }catch(error){
+        res.status(500).send(error)
+    }
+})
+app.patch('/users/:id', async (req,res)=>{
+    const _id = req.params.id
+    try{
+        const user = await User.findByIdAndUpdate(_id,req.body,{new: true, runValidators: true})
+        if(!user){
+            res.send().status(400)
+        }
+        res.status(200).send(user)
+    }catch(error){
+         res.status(400).send(error)
+    }
 })
 
+app.patch('/tasks/:id', async (req,res)=>{
+    const _id = req.params.id
+    try{
+        const task = await Task.findByIdAndUpdate(_id,req.body,{new: true, runValidators: true})
+        if (!user){
+            return res.send.status(400)
+        }
+        res.send(task)
+    }catch(error){
+        res.status(400).send(error)
+    }
+})
+
+app.patch('/softdelete/:id',async (req,res)=>{
+    try {
+        const _id = req.params.id;
+    
+        const task = await User.findByIdAndUpdate(_id, { deleted: true }, { new: true });
+    
+        if (!task) {
+          return res.status(404).send({ error: 'User not found' });
+        }
+    
+        res.send(task);
+      } catch (error) {
+        res.status(400).send(error);
+      }
+})
 app.listen(PORT, ()=>{
     console.log('server running at port', PORT)
 })
