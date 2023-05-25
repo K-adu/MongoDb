@@ -6,10 +6,10 @@ const User = require('../models/users')
 
 
 router.get('/test',(req,res)=>{
-    res.send("from a new router")
+    res.send("dummy router")
 })
 
-module.exports = router
+
 
 
 router.post('/users', async (req,res)=>{
@@ -49,6 +49,14 @@ router.get('/users/:id',async (req,res)=>{
     
 })
 
+router.post('/users/login', async (req,res)=>{
+    try{
+        const user = await User.findByCredentials(req.body.email, req.body.password)
+        res.send(user)
+    }catch(err){
+        res.send(400).send()
+    }
+})
 
 router.patch('/users/:id', async (req,res)=>{
     const _id = req.params.id
@@ -76,3 +84,4 @@ router.patch('/users/:id', async (req,res)=>{
     }
 })
 
+module.exports = router

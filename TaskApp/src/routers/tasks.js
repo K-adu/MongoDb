@@ -1,6 +1,7 @@
 const express = require('express')
 const router = new express.Router()
 const Task = require('../models/tasks')
+const { findById } = require('../models/users')
 
 
 router.post('/tasks',async (req,res)=>{
@@ -41,8 +42,25 @@ router.get('/tasks/:id',async (req,res)=>{
 
 router.patch('/tasks/:id', async (req,res)=>{
     const _id = req.params.id
+    //Object.keys returns an arrary of property name of the object req.body
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['descrition','completed']
+
+    //every methods checks the conditon
+    const isValidOperation = updates.every((update)=>allowedUpdates.includes(update))
+
+
+    if(!isValidOperation){
+        return res.status(400).send({
+            error: 'invalid updates'
+        })
+    }
     try{
-        const task = await Task.findByIdAndUpdate(_id,req.body,{new: true, runValidators: true})
+        const task = await findById(_id)
+
+        updates.forEach((update)=>task[update]= req.body[update])
+        await task.save()
+
         if (!task){
             res.send.status(400)
         }
