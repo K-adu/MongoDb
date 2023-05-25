@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
@@ -42,9 +43,25 @@ const userSchema = new mongoose.Schema({
                 throw new Error('Age must be a postive number')
             }
         }
-    }
+    },
+    tokens: [{
+        token:{
+            type: String,
+            required: true,
+        }
+    }]
 },)
 
+// generating auth token using jwt
+userSchema.methods.generateAuthToken = async function(){
+    const user = this
+    const token =  jwt.sign({_id: user._id.toString()}, 'thisisebcourse')
+    user.tokens = user.tokens.concat({token})
+    await user.save()
+    return token
+
+
+}
 
 userSchema.statics.findByCredentials = async (email,password)=>{
     const user = await User.findOne({email})

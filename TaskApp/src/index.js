@@ -7,6 +7,15 @@ const taskRouter = require('./routers/tasks')
 const app = express()
 
 app.use(express.json())
+
+
+// app.use((req, res, next) => {
+//     res.send('The server is under maintainece').status(500)
+// // Call next to pass control to the next middleware/route handler
+// });
+
+
+
 app.use(userRouter)
 app.use(taskRouter)
 
