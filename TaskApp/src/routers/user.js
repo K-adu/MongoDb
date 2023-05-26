@@ -49,13 +49,30 @@ router.post('/users/login', async (req,res)=>{
         res.send(400).send()
     }
 })
-router.post('/users/logout',auth,(req,res)=>{
+router.post('/users/logout',auth,async (req,res)=>{
     try{
+        req.user.tokens = req.user.tokens.filter((token)=>{
+            return token.token != req.token
 
+        })
+        await req.user.save()
+        res.send()
     }catch(e){
-        
+        res.status(500).send()
     }
 })
+
+router.post('/users/logoutAll',auth,async (req,res)=>{
+    try{
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    }catch(e){
+        res.status(500).send()
+    }
+})
+
+
 router.patch('/users/:id', async (req,res)=>{
     const _id = req.params.id
     const updates = Object.keys(req.body)
