@@ -49,7 +49,13 @@ router.post('/users/login', async (req,res)=>{
         res.send(400).send()
     }
 })
+router.post('/users/logout',auth,(req,res)=>{
+    try{
 
+    }catch(e){
+        
+    }
+})
 router.patch('/users/:id', async (req,res)=>{
     const _id = req.params.id
     const updates = Object.keys(req.body)
