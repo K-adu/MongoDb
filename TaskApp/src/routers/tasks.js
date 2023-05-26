@@ -2,13 +2,20 @@ const express = require('express')
 const router = new express.Router()
 const Task = require('../models/tasks')
 const { findById } = require('../models/users')
+const auth = require('../middleware/auth')
 
 
-router.post('/tasks',async (req,res)=>{
-    const task = new Task(req.body)
+
+router.post('/tasks',auth, async (req,res)=>{
+ //   const task = new Task(req.body)
+
+ const task = new Task({
+    ...req.body,
+    owner: req.user.id
+ })
     try{
         await task.save()
-        res.send(req.body)
+        res.send(task)
     }catch(error){
         res.send(error).status(400)
         res.send(err)
@@ -85,5 +92,15 @@ router.patch('/softdelete/:id',async (req,res)=>{
         res.status(500).send(error);
       }
 })
+
+// router.delete('/delete/:id', async (req,res)=>{
+    // try{
+        // const _id = req.params.id
+// 
+        // 
+    // }catch(e){
+// 
+    // }
+// })
 
 module.exports= router

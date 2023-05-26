@@ -13,6 +13,10 @@ const Task = new mongoose.model('Task',{
     deleted: {
         type: Boolean,
         default: false,
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
     }
 })
 
