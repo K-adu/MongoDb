@@ -5,11 +5,6 @@ const User = require('../models/users')
 
 
 
-router.get('/test',(req,res)=>{
-    res.send("dummy router")
-})
-
-
 
 
 router.post('/users', async (req,res)=>{
@@ -49,37 +44,55 @@ router.post('/users/login', async (req,res)=>{
         res.send(400).send()
     }
 })
-router.post('/users/logout',auth,(req,res)=>{
+router.post('/users/logout',auth,async (req,res)=>{
     try{
+        req.user.tokens = req.user.tokens.filter((token)=>{
+            return token.token != req.token
 
-    }catch(e){
-        
-    }
-})
-router.patch('/users/:id', async (req,res)=>{
-    const _id = req.params.id
-    const updates = Object.keys(req.body)
-    const allowedUpdates = ['name','email','password','age']
-    const isValidOperation = updates.every((update)=>allowedUpdates.includes(update))
-
-    if(!isValidOperation){
-        return res.status(400).send({
-            error: 'invalid updates'
         })
-    }
-    try{
-        const user = await User.findById(_id)
-
-        updates.forEach((update)=>user[update]= req.body[update])
-        await user.save()
-        //const user = await User.findByIdAndUpdate(_id,req.body,{new: true, runValidators: true})
-        if(!user){
-            res.send().status(400)
-        }
-        res.status(200).send(user)
-    }catch(error){
-         res.status(400).send(error)
+        await req.user.save()
+        res.send()
+    }catch(e){
+        res.status(500).send()
     }
 })
+
+router.post('/users/logoutAll',auth,async (req,res)=>{
+    try{
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    }catch(e){
+        res.status(500).send()
+    }
+})
+
+router.delete('/users/me', auth, async (req, res) => {
+    try {
+        await req.user.remove()
+        res.send(req.user)
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+router.patch('/users/:id', auth,async (req,res)=>{
+        const updates = Object.keys(req.body)
+    const allowedUpdates = ['name', 'email', 'password', 'age']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        return res.status(400).send({ error: 'Invalid updates!' })
+    }
+
+    try {
+        updates.forEach((update) => req.user[update] = req.body[update])
+        await req.user.save()
+        res.send(req.user)
+    } catch (e) {
+        res.status(400).send(e)
+    }
+})
+
 
 module.exports = router
