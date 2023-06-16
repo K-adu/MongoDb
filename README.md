@@ -1,2 +1,0 @@
-# MongoDb
-Notekeeping for mongodb
